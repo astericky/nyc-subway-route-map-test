@@ -9,16 +9,46 @@ import SwiftUI
 import MapKit
 import SwiftyJSON
 
+enum ColorString: String {
+  case blue = "#2185d0"
+  case green = "#21ba45"
+  case red = "#db2828"
+  case yellow = "#fbbd08"
+  case orange = "#f2711c"
+  case purple = "#a333c8"
+  case lightGreen = "#b5cc18"
+  case darkGray = "#767676"
+  case lightGray = "#A0A0A0"
+  case brown = "#a5673f"
+}
+
+class BluePolyline: MKPolyline { static let color = Color.createColor(from: ColorString.blue.rawValue) }
+class GreenPolyline: MKPolyline { static let color = Color.createColor(from: ColorString.green.rawValue) }
+class RedPolyline: MKPolyline { static let color = Color.createColor(from: ColorString.red.rawValue) }
+class YellowPolyline: MKPolyline { static let color = Color.createColor(from: ColorString.yellow.rawValue) }
+class OrangePolyline: MKPolyline { static let color = Color.createColor(from: ColorString.orange.rawValue) }
+class PurplePolyline: MKPolyline { static let color = Color.createColor(from: ColorString.purple.rawValue) }
+class LightGreenPolyline: MKPolyline { static let color = Color.createColor(from: ColorString.lightGreen.rawValue) }
+class DarkGrayPolyline: MKPolyline { static let color = Color.createColor(from: ColorString.darkGray.rawValue) }
+class LightGrayPolyline: MKPolyline { static let color = Color.createColor(from: ColorString.lightGray.rawValue) }
+class BrownPolyline: MKPolyline { static let color = Color.createColor(from: ColorString.brown.rawValue) }
+
+
+struct RouteCoordinates {
+  var coordinates: [[CLLocationCoordinate2D]]
+  var color: Color
+}
 
 /// Gets an array of coordinate lists and color for each route
 /// - Parameter route: string which represents the train route
 /// - Returns: a tuple including the array of coordinate lists and  the route color
-func getCoordinates(for route: String) -> (coordinates: [[CLLocationCoordinate2D]], color: Color) {
+func getCoordinates(for route: String) -> RouteCoordinates {
   // initial variables
   var coordinates = [[CLLocationCoordinate2D]]()
   let stationData: Data
   let routeMapData: Data
   let color: Color
+  let colorString: String
   
   // get the station-data file
   guard let stationFile = Bundle.main.url(forResource: "station-data", withExtension: "json") else {
@@ -46,7 +76,8 @@ func getCoordinates(for route: String) -> (coordinates: [[CLLocationCoordinate2D
     let routeMapJSON = try JSON(data: routeMapData)
     
     // get route color
-    color = Color.createColor(from: routeMapJSON["routes"][route]["color"].stringValue)
+    colorString = routeMapJSON["routes"][route]["color"].stringValue
+    color = Color.createColor(from: colorString)
     
     // get route map list; this is an array of routes;
     // each route in the routeList is an array of strings representing the stations
@@ -87,42 +118,81 @@ func getCoordinates(for route: String) -> (coordinates: [[CLLocationCoordinate2D
     fatalError("Couldn't convert data to JSON.\n\(error)")
   }
 
-  return (coordinates, color)
+  return RouteCoordinates(coordinates: coordinates, color: color)
 }
 
 
-//static let route =  {
-//  let routeMapData: Data
-//  guard let routeMapFile = Bundle.main.url(forResource: "route-map-data", withExtension: "json") else {
-//    fatalError("Couldn't find route-map-data.json in main bundle.")
-//  }
-//
-//  do {
-//    routeMapData = try Data(contentsOf: routeMapFile)
-//    let routeMapJSON = try JSON(data: routeMapData)
-//    let routes = routeMapJSON["routes"].dictionaryValue.keys
-//
-//  } catch {
-//    fatalError("Couldn't load station-data and route-map-data from main bundle:\n\(error)")
-//  }
-//  getCoordinates(for: "D")
-//}
+func getAllRouteCoordinates() -> [RouteCoordinates]  {
+  var routeCoordinates = [RouteCoordinates]()
+  let routeMapData: Data
+  guard let routeMapFile = Bundle.main.url(forResource: "route-map-data", withExtension: "json") else {
+    fatalError("Couldn't find route-map-data.json in main bundle.")
+  }
+
+  do {
+    routeMapData = try Data(contentsOf: routeMapFile)
+    let routeMapJSON = try JSON(data: routeMapData)
+    let routes = routeMapJSON["routes"].dictionaryValue.keys
+    
+    for route in routes {
+      routeCoordinates.append(getCoordinates(for: route))
+    }
+  } catch {
+    fatalError("Couldn't load station-data and route-map-data from main bundle:\n\(error)")
+  }
+  
+  return routeCoordinates
+}
+
 
 
 struct MapViewUI: UIViewRepresentable {
   
   let mapViewType: MKMapType = .standard
-  static let route = getCoordinates(for: "A")
+//  static let route = getCoordinates(for: "E")
   
   func makeUIView(context: Context) -> MKMapView {
-    let polylines = MapViewUI.route.coordinates.map { MKPolyline(coordinates: $0, count: $0.count) }
+
+    let polylinesList = getAllRouteCoordinates().map { polylineListItem -> [MKPolyline] in
+      polylineListItem.coordinates.map { coordinates -> MKPolyline in
+        switch polylineListItem.color {
+        case BluePolyline.color:
+          return BluePolyline(coordinates: coordinates, count: coordinates.count)
+        case GreenPolyline.color:
+          return GreenPolyline(coordinates: coordinates, count: coordinates.count)
+        case RedPolyline.color:
+          return RedPolyline(coordinates: coordinates, count: coordinates.count)
+        case YellowPolyline.color:
+          return YellowPolyline(coordinates: coordinates, count: coordinates.count)
+        case OrangePolyline.color:
+          return OrangePolyline(coordinates: coordinates, count: coordinates.count)
+        case LightGreenPolyline.color:
+          return LightGreenPolyline(coordinates: coordinates, count: coordinates.count)
+        case LightGrayPolyline.color:
+          return LightGrayPolyline(coordinates: coordinates, count: coordinates.count)
+        case DarkGrayPolyline.color:
+          return DarkGrayPolyline(coordinates: coordinates, count: coordinates.count)
+        case BrownPolyline.color:
+          return BrownPolyline(coordinates: coordinates, count: coordinates.count)
+        default:
+          return MKPolyline(coordinates: coordinates, count: coordinates.count)
+        }
+      }
+    }
+    
+//    var polylines = MapViewUI.route.coordinates.map { BluePolyline(coordinates: $0, count: $0.count) }
+
     let coordinate = CLLocationCoordinate2D(latitude: 40.730610, longitude: -73.935242)
-    let span = MKCoordinateSpan(latitudeDelta: 0.10, longitudeDelta: 0.10)
+    let span = MKCoordinateSpan(latitudeDelta: 0.50, longitudeDelta: 0.50)
     let region = MKCoordinateRegion(center: coordinate, span: span)
     let mapView = MKMapView()
     mapView.setRegion(region, animated: true)
     mapView.mapType = mapViewType
-    mapView.addOverlays(polylines)
+    for polylinesItem in polylinesList {
+      mapView.addOverlays(polylinesItem)
+    }
+//    mapView.addOverlays(polylines)
+
     mapView.delegate = context.coordinator
     
     return mapView
@@ -138,13 +208,63 @@ struct MapViewUI: UIViewRepresentable {
   
   final class MapCoordinator: NSObject, MKMapViewDelegate {
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+      
       if overlay is MKPolyline {
         let renderer = MKPolylineRenderer(overlay: overlay)
-        renderer.strokeColor = UIColor(MapViewUI.route.color)
         renderer.lineCap = .round
         renderer.lineWidth = 2.0
-        return renderer
+        
+        if overlay is BluePolyline {
+          renderer.strokeColor = UIColor(BluePolyline.color)
+          return renderer
+        }
+        
+        if overlay is RedPolyline {
+          renderer.strokeColor = UIColor(RedPolyline.color)
+          return renderer
+        }
+        
+        if overlay is GreenPolyline {
+          renderer.strokeColor = UIColor(GreenPolyline.color)
+          return renderer
+        }
+        
+        if overlay is YellowPolyline {
+          renderer.strokeColor = UIColor(YellowPolyline.color)
+          return renderer
+        }
+        
+        if overlay is OrangePolyline {
+          renderer.strokeColor = UIColor(OrangePolyline.color)
+          return renderer
+        }
+        
+        if overlay is PurplePolyline {
+          renderer.strokeColor = UIColor(PurplePolyline.color)
+          return renderer
+        }
+        
+        if overlay is LightGreenPolyline {
+          renderer.strokeColor = UIColor(LightGreenPolyline.color)
+          return renderer
+        }
+        
+        if overlay is LightGrayPolyline {
+          renderer.strokeColor = UIColor(LightGrayPolyline.color)
+          return renderer
+        }
+        
+        if overlay is DarkGrayPolyline {
+          renderer.strokeColor = UIColor(DarkGrayPolyline.color)
+          return renderer
+        }
+        
+        if overlay is BrownPolyline {
+          renderer.strokeColor = UIColor(BrownPolyline.color)
+          return renderer
+        }
       }
+      
       return MKOverlayRenderer(overlay: overlay)
     }
   }
