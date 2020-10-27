@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13,6 +13,11 @@
 		2A19F1A3254743C500261E04 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2A19F1A2254743C500261E04 /* Preview Assets.xcassets */; };
 		2A19F1AE254743C600261E04 /* RouteMapTestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A19F1AD254743C600261E04 /* RouteMapTestTests.swift */; };
 		2A19F1B9254743C600261E04 /* RouteMapTestUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A19F1B8254743C600261E04 /* RouteMapTestUITests.swift */; };
+		2A19F1CB2547442600261E04 /* route-map-data.json in Resources */ = {isa = PBXBuildFile; fileRef = 2A19F1CA2547442600261E04 /* route-map-data.json */; };
+		2A19F1D32547444400261E04 /* station-data.json in Resources */ = {isa = PBXBuildFile; fileRef = 2A19F1D22547444400261E04 /* station-data.json */; };
+		2A19F1D9254744C300261E04 /* MapViewUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A19F1D8254744C300261E04 /* MapViewUI.swift */; };
+		2A19F1E22547492600261E04 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 2A19F1E12547492600261E04 /* SwiftyJSON */; };
+		2A19F1ED2547643F00261E04 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A19F1EC2547643F00261E04 /* Color+Hex.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +50,10 @@
 		2A19F1B4254743C600261E04 /* RouteMapTestUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RouteMapTestUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A19F1B8254743C600261E04 /* RouteMapTestUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteMapTestUITests.swift; sourceTree = "<group>"; };
 		2A19F1BA254743C600261E04 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2A19F1CA2547442600261E04 /* route-map-data.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "route-map-data.json"; sourceTree = "<group>"; };
+		2A19F1D22547444400261E04 /* station-data.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "station-data.json"; sourceTree = "<group>"; };
+		2A19F1D8254744C300261E04 /* MapViewUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewUI.swift; sourceTree = "<group>"; };
+		2A19F1EC2547643F00261E04 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +61,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2A19F1E22547492600261E04 /* SwiftyJSON in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -95,8 +105,11 @@
 		2A19F19A254743C400261E04 /* RouteMapTest */ = {
 			isa = PBXGroup;
 			children = (
+				2A19F1EB2547642B00261E04 /* Extensions */,
+				2A19F1D7254744AE00261E04 /* Views */,
 				2A19F19B254743C400261E04 /* RouteMapTestApp.swift */,
 				2A19F19D254743C400261E04 /* ContentView.swift */,
+				2A19F1C9254743E600261E04 /* Test Data */,
 				2A19F19F254743C500261E04 /* Assets.xcassets */,
 				2A19F1A4254743C500261E04 /* Info.plist */,
 				2A19F1A1254743C500261E04 /* Preview Content */,
@@ -130,6 +143,31 @@
 			path = RouteMapTestUITests;
 			sourceTree = "<group>";
 		};
+		2A19F1C9254743E600261E04 /* Test Data */ = {
+			isa = PBXGroup;
+			children = (
+				2A19F1CA2547442600261E04 /* route-map-data.json */,
+				2A19F1D22547444400261E04 /* station-data.json */,
+			);
+			path = "Test Data";
+			sourceTree = "<group>";
+		};
+		2A19F1D7254744AE00261E04 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				2A19F1D8254744C300261E04 /* MapViewUI.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		2A19F1EB2547642B00261E04 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				2A19F1EC2547643F00261E04 /* Color+Hex.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -146,6 +184,9 @@
 			dependencies = (
 			);
 			name = RouteMapTest;
+			packageProductDependencies = (
+				2A19F1E12547492600261E04 /* SwiftyJSON */,
+			);
 			productName = RouteMapTest;
 			productReference = 2A19F198254743C400261E04 /* RouteMapTest.app */;
 			productType = "com.apple.product-type.application";
@@ -217,6 +258,9 @@
 				Base,
 			);
 			mainGroup = 2A19F18F254743C400261E04;
+			packageReferences = (
+				2A19F1E02547492600261E04 /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
+			);
 			productRefGroup = 2A19F199254743C400261E04 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -234,6 +278,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				2A19F1A3254743C500261E04 /* Preview Assets.xcassets in Resources */,
+				2A19F1CB2547442600261E04 /* route-map-data.json in Resources */,
+				2A19F1D32547444400261E04 /* station-data.json in Resources */,
 				2A19F1A0254743C500261E04 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -259,6 +305,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2A19F1D9254744C300261E04 /* MapViewUI.swift in Sources */,
+				2A19F1ED2547643F00261E04 /* Color+Hex.swift in Sources */,
 				2A19F19E254743C400261E04 /* ContentView.swift in Sources */,
 				2A19F19C254743C400261E04 /* RouteMapTestApp.swift in Sources */,
 			);
@@ -580,6 +628,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		2A19F1E02547492600261E04 /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2A19F1E12547492600261E04 /* SwiftyJSON */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A19F1E02547492600261E04 /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
+			productName = SwiftyJSON;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 2A19F190254743C400261E04 /* Project object */;
 }
