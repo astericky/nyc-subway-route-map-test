@@ -81,9 +81,38 @@ func getCoordinates(for route: String) -> RouteCoordinates {
     
     // get route map list; this is an array of routes;
     // each route in the routeList is an array of strings representing the stations
-    let routeList = routeMapJSON["routes"][route]["routings"]["south"].arrayValue.map {
+    var routeList = routeMapJSON["routes"][route]["routings"]["south"].arrayValue.map {
       $0.arrayValue.map { String($0.stringValue.dropLast()) }
     }
+//    print(routeList)
+//    print("-----------------------")
+    // fill in station gaps if they exist
+    for routeElement in routeList {
+        var routeElementList = routeElement
+        for (index, element) in routeElement.enumerated() {
+            var nextRouteElementIndex = index + 1
+            if nextRouteElementIndex < routeElement.count {
+                let nextRouteElement = routeElement[nextRouteElementIndex]
+
+                let currentStation = stationJSON[element]
+                let nextStation = currentStation["south"][nextRouteElement]
+
+                if !nextStation.exists() {
+                    let hasNewStation = !currentStation["south"].arrayValue.isEmpty
+                    if (hasNewStation) {
+                        let newStation = currentStation["south"].arrayValue[0].stringValue
+                        repeat {
+                            routeElementList.insert(newStation, at: nextRouteElementIndex)
+                            nextRouteElementIndex = nextRouteElementIndex + 1
+                        } while (newStation != nextRouteElement)
+                    }
+
+                }
+            }
+        }
+    }
+    
+    print(routeList)
     
     // for each route in the routeList
     for routeElement in routeList {
@@ -149,38 +178,38 @@ func getAllRouteCoordinates() -> [RouteCoordinates]  {
 struct MapViewUI: UIViewRepresentable {
   
   let mapViewType: MKMapType = .standard
-//  static let route = getCoordinates(for: "E")
+  static let route = getCoordinates(for: "E")
   
   func makeUIView(context: Context) -> MKMapView {
 
-    let polylinesList = getAllRouteCoordinates().map { polylineListItem -> [MKPolyline] in
-      polylineListItem.coordinates.map { coordinates -> MKPolyline in
-        switch polylineListItem.color {
-        case BluePolyline.color:
-          return BluePolyline(coordinates: coordinates, count: coordinates.count)
-        case GreenPolyline.color:
-          return GreenPolyline(coordinates: coordinates, count: coordinates.count)
-        case RedPolyline.color:
-          return RedPolyline(coordinates: coordinates, count: coordinates.count)
-        case YellowPolyline.color:
-          return YellowPolyline(coordinates: coordinates, count: coordinates.count)
-        case OrangePolyline.color:
-          return OrangePolyline(coordinates: coordinates, count: coordinates.count)
-        case LightGreenPolyline.color:
-          return LightGreenPolyline(coordinates: coordinates, count: coordinates.count)
-        case LightGrayPolyline.color:
-          return LightGrayPolyline(coordinates: coordinates, count: coordinates.count)
-        case DarkGrayPolyline.color:
-          return DarkGrayPolyline(coordinates: coordinates, count: coordinates.count)
-        case BrownPolyline.color:
-          return BrownPolyline(coordinates: coordinates, count: coordinates.count)
-        default:
-          return MKPolyline(coordinates: coordinates, count: coordinates.count)
-        }
-      }
-    }
+//    let polylinesList = getAllRouteCoordinates().map { polylineListItem -> [MKPolyline] in
+//      polylineListItem.coordinates.map { coordinates -> MKPolyline in
+//        switch polylineListItem.color {
+//        case BluePolyline.color:
+//          return BluePolyline(coordinates: coordinates, count: coordinates.count)
+//        case GreenPolyline.color:
+//          return GreenPolyline(coordinates: coordinates, count: coordinates.count)
+//        case RedPolyline.color:
+//          return RedPolyline(coordinates: coordinates, count: coordinates.count)
+//        case YellowPolyline.color:
+//          return YellowPolyline(coordinates: coordinates, count: coordinates.count)
+//        case OrangePolyline.color:
+//          return OrangePolyline(coordinates: coordinates, count: coordinates.count)
+//        case LightGreenPolyline.color:
+//          return LightGreenPolyline(coordinates: coordinates, count: coordinates.count)
+//        case LightGrayPolyline.color:
+//          return LightGrayPolyline(coordinates: coordinates, count: coordinates.count)
+//        case DarkGrayPolyline.color:
+//          return DarkGrayPolyline(coordinates: coordinates, count: coordinates.count)
+//        case BrownPolyline.color:
+//          return BrownPolyline(coordinates: coordinates, count: coordinates.count)
+//        default:
+//          return MKPolyline(coordinates: coordinates, count: coordinates.count)
+//        }
+//      }
+//    }
     
-//    var polylines = MapViewUI.route.coordinates.map { BluePolyline(coordinates: $0, count: $0.count) }
+    var polylines = MapViewUI.route.coordinates.map { BluePolyline(coordinates: $0, count: $0.count) }
 
     let coordinate = CLLocationCoordinate2D(latitude: 40.730610, longitude: -73.935242)
     let span = MKCoordinateSpan(latitudeDelta: 0.50, longitudeDelta: 0.50)
@@ -188,10 +217,10 @@ struct MapViewUI: UIViewRepresentable {
     let mapView = MKMapView()
     mapView.setRegion(region, animated: true)
     mapView.mapType = mapViewType
-    for polylinesItem in polylinesList {
-      mapView.addOverlays(polylinesItem)
-    }
-//    mapView.addOverlays(polylines)
+//    for polylinesItem in polylinesList {
+//      mapView.addOverlays(polylinesItem)
+//    }
+    mapView.addOverlays(polylines)
 
     mapView.delegate = context.coordinator
     
